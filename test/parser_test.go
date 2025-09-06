@@ -11,7 +11,6 @@ import (
 func TestRequestParser_Parse(t *testing.T) {
 	parser := requestparser.NewRequestParser()
 
-	// Создаем тестовый запрос
 	req := &http.Request{
 		Method:     "GET",
 		Header:     make(http.Header),
@@ -19,11 +18,9 @@ func TestRequestParser_Parse(t *testing.T) {
 		RemoteAddr: "203.0.113.45:54321",
 	}
 
-	// Устанавливаем URL
 	testURL, _ := url.Parse("https://example.com/test")
 	req.URL = testURL
 
-	// Добавляем тестовые заголовки
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
 	req.Header.Set("Accept-Language", "en-US,en;q=0.9,ru;q=0.8")
 	req.Header.Set("Accept-Encoding", "gzip, deflate, br")
@@ -33,7 +30,6 @@ func TestRequestParser_Parse(t *testing.T) {
 
 	userInfo := parser.Parse(req)
 
-	// Проверяем базовые данные
 	if userInfo.GetIP() != "192.168.1.100" {
 		t.Errorf("Ожидался IP 192.168.1.100, получен %s", userInfo.GetIP())
 	}
@@ -46,30 +42,25 @@ func TestRequestParser_Parse(t *testing.T) {
 		t.Errorf("Ожидался метод GET, получен %s", userInfo.GetMethod())
 	}
 
-	// Проверяем User-Agent
 	if userInfo.GetUserAgent() == "" {
 		t.Error("User-Agent не должен быть пустым")
 	}
 
-	// Проверяем браузер
 	browser := userInfo.GetBrowser()
 	if browser.GetName() != "Chrome" {
 		t.Errorf("Ожидался браузер Chrome, получен %s", browser.GetName())
 	}
 
-	// Проверяем ОС
 	os := userInfo.GetOS()
 	if os.GetName() != "Windows" {
 		t.Errorf("Ожидалась ОС Windows, получена %s", os.GetName())
 	}
 
-	// Проверяем устройство
 	device := userInfo.GetDevice()
 	if device.GetType() != "desktop" {
 		t.Errorf("Ожидался тип устройства desktop, получен %s", device.GetType())
 	}
 
-	// Проверяем языки
 	languages := userInfo.GetAcceptLanguage()
 	if len(languages) == 0 {
 		t.Error("Список языков не должен быть пустым")
@@ -78,7 +69,6 @@ func TestRequestParser_Parse(t *testing.T) {
 		t.Errorf("Первый язык должен быть en-US, получен %s", languages[0])
 	}
 
-	// Проверяем флаги
 	if !userInfo.IsDoNotTrack() {
 		t.Error("Флаг Do Not Track должен быть true")
 	}
@@ -87,7 +77,6 @@ func TestRequestParser_Parse(t *testing.T) {
 		t.Error("Флаг Upgrade Insecure Requests должен быть true")
 	}
 
-	// Проверяем JSON
 	json, err := userInfo.ToJSON()
 	if err != nil {
 		t.Errorf("Ошибка при создании JSON: %v", err)
@@ -96,7 +85,6 @@ func TestRequestParser_Parse(t *testing.T) {
 		t.Error("JSON не должен быть пустым")
 	}
 
-	// Проверяем отпечаток
 	fingerprint := userInfo.GetClientFingerprint()
 	if fingerprint == "" {
 		t.Error("Отпечаток клиента не должен быть пустым")
@@ -115,7 +103,6 @@ func TestMobileUserAgent(t *testing.T) {
 	testURL, _ := url.Parse("https://example.com/test")
 	req.URL = testURL
 
-	// iPhone User-Agent
 	req.Header.Set("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1")
 
 	userInfo := parser.Parse(req)
@@ -147,7 +134,6 @@ func TestBotUserAgent(t *testing.T) {
 	testURL, _ := url.Parse("https://example.com/test")
 	req.URL = testURL
 
-	// Bot User-Agent
 	req.Header.Set("User-Agent", "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)")
 
 	userInfo := parser.Parse(req)
